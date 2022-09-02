@@ -13,7 +13,7 @@ import com.vinnissaum.mycontactsspring.services.CategoryService;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping(value = "/categories")
 @AllArgsConstructor
 public class CategoryController {
 
