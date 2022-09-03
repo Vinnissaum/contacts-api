@@ -25,9 +25,19 @@ public class CategoryService {
         return repository.findAll();
     }
 
+    @Transactional
     public Category findById(UUID id) {
         Optional<Category> obj = repository.findById(id);
         return obj.orElseThrow(() -> new ResourceNotFoundException("Category not found: " + id));
+    }
+
+    @Transactional
+    public Category create(Category category) {
+        Category entity = new Category();
+        entity.setName(category.getName());
+        entity = repository.save(entity);
+
+        return entity;
     }
 
 }
