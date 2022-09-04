@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -40,4 +41,26 @@ public class CategoryService {
         return entity;
     }
 
+    @Transactional
+    public Category update(UUID id, Category category) {
+        try {
+            Category entity = repository.getReferenceById(id);
+            entity.setName(category.getName());
+            entity = repository.save(entity);
+
+            return entity;
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Id not found: " + id);
+        }
+    }
+
+    public void delete(UUID id) {
+        try {
+            Category entity = repository.getReferenceById(id);
+            repository.delete(entity);
+
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Id not found: " + id);
+        }
+    }
 }
