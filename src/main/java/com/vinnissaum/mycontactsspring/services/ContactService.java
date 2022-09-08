@@ -23,6 +23,8 @@ import lombok.AllArgsConstructor;
 public class ContactService {
     private final ContactRepository repository;
 
+    private static final String CONTACT_NOT_FOUND = "Contact not found: ";
+
     @Transactional
     public List<Contact> findAll(Sort direction) {
         return repository.findAll(direction);
@@ -32,7 +34,7 @@ public class ContactService {
     public Contact findById(UUID id) {
         Optional<Contact> obj = repository.findById(id);
         return obj.orElseThrow(
-            () -> new ResourceNotFoundException("Contact not found: " + id));
+            () -> new ResourceNotFoundException(CONTACT_NOT_FOUND + id));
     }
 
     @Transactional
@@ -51,7 +53,7 @@ public class ContactService {
             obj.setPhone(entity.getPhone());
             return repository.save(obj);
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Contact not found: " + id);
+            throw new ResourceNotFoundException(CONTACT_NOT_FOUND + id);
         }
     }
 
@@ -59,7 +61,7 @@ public class ContactService {
         try {
             repository.deleteById(id);
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Contact not found: " + id);
+            throw new ResourceNotFoundException(CONTACT_NOT_FOUND + id);
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Integrity violation: " + e.getMessage());
         }
