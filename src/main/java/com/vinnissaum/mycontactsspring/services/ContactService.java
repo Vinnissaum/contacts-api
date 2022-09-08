@@ -39,6 +39,7 @@ public class ContactService {
 
     @Transactional
     public Contact create(Contact entity) {
+        emailExists(entity.getEmail());
         Contact contact = repository.save(entity);
 
         return repository.save(contact);
@@ -48,6 +49,7 @@ public class ContactService {
     public Contact update(UUID id, Contact entity) {
         try {
             Contact obj = repository.getReferenceById(id);
+            emailExists(entity.getEmail());
             obj.setName(entity.getName());
             obj.setEmail(entity.getEmail());
             obj.setPhone(entity.getPhone());
@@ -64,6 +66,14 @@ public class ContactService {
             throw new ResourceNotFoundException(CONTACT_NOT_FOUND + id);
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Integrity violation: " + e.getMessage());
+        }
+    }
+
+    public void emailExists(String email) {
+        Contact emailExists = repository.findByEmail(email);
+
+        if (emailExists != null) {
+            throw new DatabaseException("This email has already been taken");
         }
     }
 }
