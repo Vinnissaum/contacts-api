@@ -7,11 +7,13 @@ import java.util.UUID;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vinnissaum.mycontactsspring.entities.Contact;
 import com.vinnissaum.mycontactsspring.repositories.ContactRepository;
+import com.vinnissaum.mycontactsspring.services.errors.DatabaseException;
 import com.vinnissaum.mycontactsspring.services.errors.ResourceNotFoundException;
 
 import lombok.AllArgsConstructor;
@@ -50,6 +52,16 @@ public class ContactService {
             return repository.save(obj);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException("Contact not found: " + id);
+        }
+    }
+
+    public void delete(UUID id) {
+        try {
+            repository.deleteById(id);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Contact not found: " + id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Integrity violation: " + e.getMessage());
         }
     }
 }
