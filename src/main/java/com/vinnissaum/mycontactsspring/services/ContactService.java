@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Sort;
@@ -30,5 +31,25 @@ public class ContactService {
         Optional<Contact> obj = repository.findById(id);
         return obj.orElseThrow(
             () -> new ResourceNotFoundException("Contact not found: " + id));
+    }
+
+    @Transactional
+    public Contact create(Contact entity) {
+        Contact contact = repository.save(entity);
+
+        return repository.save(contact);
+    }
+
+    @Transactional
+    public Contact update(UUID id, Contact entity) {
+        try {
+            Contact obj = repository.getReferenceById(id);
+            obj.setName(entity.getName());
+            obj.setEmail(entity.getEmail());
+            obj.setPhone(entity.getPhone());
+            return repository.save(obj);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Contact not found: " + id);
+        }
     }
 }
