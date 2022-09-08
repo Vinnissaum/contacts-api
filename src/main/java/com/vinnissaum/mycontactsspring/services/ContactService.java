@@ -44,6 +44,8 @@ public class ContactService {
 
     @Transactional
     public ContactDTO create(ContactDTO dto) {
+        nameExists(dto.getName());
+
         Contact entity = new Contact();
         emailExists(dto.getEmail());
         toEntity(entity, dto);
@@ -54,6 +56,8 @@ public class ContactService {
 
     @Transactional
     public ContactDTO update(UUID id, ContactDTO dto) {
+        nameExists(dto.getName());
+
         try {
             Contact entity = repository.getReferenceById(id);
             emailExists(dto.getEmail());
@@ -75,7 +79,13 @@ public class ContactService {
         }
     }
 
-    public void emailExists(String email) {
+    private void nameExists(String name) {
+        if (name == null) {
+            throw new DatabaseException("Name is required");
+        }
+    }
+
+    private void emailExists(String email) {
         Contact emailExists = repository.findByEmail(email);
 
         if (emailExists != null) {

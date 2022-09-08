@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.vinnissaum.mycontactsspring.dto.CategoryDTO;
 import com.vinnissaum.mycontactsspring.entities.Category;
 import com.vinnissaum.mycontactsspring.repositories.CategoryRepository;
+import com.vinnissaum.mycontactsspring.services.errors.DatabaseException;
 import com.vinnissaum.mycontactsspring.services.errors.ResourceNotFoundException;
 
 import lombok.AllArgsConstructor;
@@ -40,19 +41,23 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDTO create(CategoryDTO category) {
+    public CategoryDTO create(CategoryDTO dto) {
+        nameExists(dto.getName());
+
         Category entity = new Category();
-        entity.setName(category.getName());
+        entity.setName(dto.getName());
         entity = repository.save(entity);
 
         return new CategoryDTO(entity);
     }
 
     @Transactional
-    public CategoryDTO update(UUID id, CategoryDTO category) {
+    public CategoryDTO update(UUID id, CategoryDTO dto) {
+        nameExists(dto.getName());
+
         try {
             Category entity = repository.getReferenceById(id);
-            entity.setName(category.getName());
+            entity.setName(dto.getName());
             entity = repository.save(entity);
 
             return new CategoryDTO(entity);
@@ -68,6 +73,12 @@ public class CategoryService {
 
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(CATEGORY_NOT_FOUND + id);
+        }
+    }
+
+    private void nameExists(String name) {
+        if (name == null) {
+            throw new DatabaseException("Name is required");
         }
     }
 }
