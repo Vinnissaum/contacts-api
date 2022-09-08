@@ -5,8 +5,10 @@ import java.util.UUID;
 import com.vinnissaum.mycontactsspring.entities.Category;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class CategoryDTO {
 
     private UUID id;
