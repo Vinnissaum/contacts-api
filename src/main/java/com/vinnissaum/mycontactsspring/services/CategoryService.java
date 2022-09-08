@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.vinnissaum.mycontactsspring.dto.CategoryDTO;
 import com.vinnissaum.mycontactsspring.entities.Category;
 import com.vinnissaum.mycontactsspring.repositories.CategoryRepository;
 import com.vinnissaum.mycontactsspring.services.errors.ResourceNotFoundException;
@@ -21,36 +22,42 @@ public class CategoryService {
 
     private final CategoryRepository repository;
 
+    private static final String CATEGORY_NOT_FOUND = "Category not found: ";
+
     @Transactional
-    public List<Category> findAll() {
-        return repository.findAll();
+    public List<CategoryDTO> findAll() {
+        List<Category> list = repository.findAll();
+
+        return list.stream().map(CategoryDTO::new).toList();
     }
 
     @Transactional
-    public Category findById(UUID id) {
+    public CategoryDTO findById(UUID id) {
         Optional<Category> obj = repository.findById(id);
-        return obj.orElseThrow(() -> new ResourceNotFoundException("Category not found: " + id));
+        Category entity = obj.orElseThrow(
+            () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND + id));
+        return new CategoryDTO(entity);
     }
 
     @Transactional
-    public Category create(Category category) {
+    public CategoryDTO create(CategoryDTO category) {
         Category entity = new Category();
         entity.setName(category.getName());
         entity = repository.save(entity);
 
-        return entity;
+        return new CategoryDTO(entity);
     }
 
     @Transactional
-    public Category update(UUID id, Category category) {
+    public CategoryDTO update(UUID id, CategoryDTO category) {
         try {
             Category entity = repository.getReferenceById(id);
             entity.setName(category.getName());
             entity = repository.save(entity);
 
-            return entity;
+            return new CategoryDTO(entity);
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Id not found: " + id);
+            throw new ResourceNotFoundException(CATEGORY_NOT_FOUND + id);
         }
     }
 
@@ -60,7 +67,7 @@ public class CategoryService {
             repository.delete(entity);
 
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException("Id not found: " + id);
+            throw new ResourceNotFoundException(CATEGORY_NOT_FOUND + id);
         }
     }
 }

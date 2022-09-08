@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.vinnissaum.mycontactsspring.entities.Category;
+import com.vinnissaum.mycontactsspring.dto.CategoryDTO;
 import com.vinnissaum.mycontactsspring.services.CategoryService;
 
 import lombok.AllArgsConstructor;
@@ -29,20 +29,20 @@ public class CategoryController {
     private final CategoryService service;
 
     @GetMapping
-    public ResponseEntity<List<Category>> index() {
-        List<Category> list = service.findAll();
+    public ResponseEntity<List<CategoryDTO>> index() {
+        List<CategoryDTO> list = service.findAll();
         return ResponseEntity.ok(list);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Category> show(@PathVariable UUID id) {
-        Category category = service.findById(id);
+    public ResponseEntity<CategoryDTO> show(@PathVariable UUID id) {
+        CategoryDTO category = service.findById(id);
         return ResponseEntity.ok(category);
     }
 
     @PostMapping
-    public ResponseEntity<Category> store(@RequestBody Category cat) {
-        Category category = service.create(cat);
+    public ResponseEntity<CategoryDTO> store(@RequestBody CategoryDTO cat) {
+        CategoryDTO category = service.create(cat);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
         .buildAndExpand(cat.getId()).toUri();
 
@@ -50,10 +50,10 @@ public class CategoryController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Category> update(@PathVariable UUID id,
-    @RequestBody Category cat)
+    public ResponseEntity<CategoryDTO> update(@PathVariable UUID id,
+    @RequestBody CategoryDTO cat)
     {
-        Category category = service.update(id, cat);
+        CategoryDTO category = service.update(id, cat);
         return ResponseEntity.ok(category);
     }
 
