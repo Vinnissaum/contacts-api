@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.vinnissaum.mycontactsspring.dto.ContactDTO;
 import com.vinnissaum.mycontactsspring.entities.Contact;
 import com.vinnissaum.mycontactsspring.repositories.ContactRepository;
 import com.vinnissaum.mycontactsspring.services.errors.DatabaseException;
@@ -26,34 +27,39 @@ public class ContactService {
     private static final String CONTACT_NOT_FOUND = "Contact not found: ";
 
     @Transactional
-    public List<Contact> findAll(Sort direction) {
-        return repository.findAll(direction);
+    public List<ContactDTO> findAll(Sort direction) {
+        List<Contact> list = repository.findAll(direction);
+
+        return list.stream().map(ContactDTO::new).toList();
     }
 
     @Transactional
-    public Contact findById(UUID id) {
+    public ContactDTO findById(UUID id) {
         Optional<Contact> obj = repository.findById(id);
-        return obj.orElseThrow(
+        Contact entity = obj.orElseThrow(
             () -> new ResourceNotFoundException(CONTACT_NOT_FOUND + id));
+
+        return new ContactDTO(entity);
     }
 
     @Transactional
-    public Contact create(Contact entity) {
-        emailExists(entity.getEmail());
-        Contact contact = repository.save(entity);
+    public ContactDTO create(ContactDTO dto) {
+        Contact entity = new Contact();
+        emailExists(dto.getEmail());
+        toEntity(entity, dto);
+        entity = repository.save(entity);
 
-        return repository.save(contact);
+        return new ContactDTO(entity);
     }
 
     @Transactional
-    public Contact update(UUID id, Contact entity) {
+    public ContactDTO update(UUID id, ContactDTO dto) {
         try {
-            Contact obj = repository.getReferenceById(id);
-            emailExists(entity.getEmail());
-            obj.setName(entity.getName());
-            obj.setEmail(entity.getEmail());
-            obj.setPhone(entity.getPhone());
-            return repository.save(obj);
+            Contact entity = repository.getReferenceById(id);
+            emailExists(dto.getEmail());
+            toEntity(entity, dto);
+            entity = repository.save(entity);
+            return new ContactDTO(entity);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(CONTACT_NOT_FOUND + id);
         }
@@ -75,5 +81,11 @@ public class ContactService {
         if (emailExists != null) {
             throw new DatabaseException("This email has already been taken");
         }
+    }
+
+    public void toEntity(Contact entity, ContactDTO dto) {
+        entity.setName(dto.getName());
+        entity.setEmail(dto.getEmail());
+        entity.setPhone(dto.getPhone());
     }
 }

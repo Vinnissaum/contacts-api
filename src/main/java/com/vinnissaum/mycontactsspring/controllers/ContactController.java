@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.vinnissaum.mycontactsspring.entities.Contact;
+import com.vinnissaum.mycontactsspring.dto.ContactDTO;
 import com.vinnissaum.mycontactsspring.services.ContactService;
 
 import lombok.AllArgsConstructor;
@@ -29,24 +29,24 @@ public class ContactController {
     private final ContactService service;
 
     @GetMapping
-    public ResponseEntity<List<Contact>> index(
+    public ResponseEntity<List<ContactDTO>> index(
         @RequestParam(value = "order", defaultValue = "ASC") String order) {
-        List<Contact> contacts = service.findAll(Sort.by(Sort.Direction
+        List<ContactDTO> contacts = service.findAll(Sort.by(Sort.Direction
             .valueOf(order.toUpperCase()), "name"));
 
         return ResponseEntity.ok(contacts);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Contact> show(@PathVariable UUID id) {
-        Contact contact = service.findById(id);
+    public ResponseEntity<ContactDTO> show(@PathVariable UUID id) {
+        ContactDTO contact = service.findById(id);
 
         return ResponseEntity.ok(contact);
     }
 
     @PostMapping
-    public ResponseEntity<Contact> create(@RequestBody Contact entity) {
-        Contact contact = service.create(entity);
+    public ResponseEntity<ContactDTO> create(@RequestBody ContactDTO entity) {
+        ContactDTO contact = service.create(entity);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(entity.getId()).toUri();
 
@@ -54,15 +54,15 @@ public class ContactController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Contact> create(@RequestBody Contact entity,
+    public ResponseEntity<ContactDTO> create(@RequestBody ContactDTO entity,
     @PathVariable UUID id) {
-        Contact contact = service.update(id, entity);
+        ContactDTO contact = service.update(id, entity);
 
         return ResponseEntity.ok(contact);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Contact> delete(@PathVariable UUID id) {
+    public ResponseEntity<ContactDTO> delete(@PathVariable UUID id) {
         service.delete(id);
 
         return ResponseEntity.noContent().build();
