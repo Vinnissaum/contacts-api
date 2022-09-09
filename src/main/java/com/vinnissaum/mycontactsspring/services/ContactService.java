@@ -28,7 +28,7 @@ public class ContactService {
 
     @Transactional
     public List<ContactDTO> findAll(Sort direction) {
-        List<Contact> list = repository.findAll(direction);
+        List<Contact> list = repository.findAll();
 
         return list.stream().map(ContactDTO::new).toList();
     }

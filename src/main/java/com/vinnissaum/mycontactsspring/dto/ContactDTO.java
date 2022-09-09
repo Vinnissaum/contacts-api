@@ -19,10 +19,13 @@ public class ContactDTO {
 
     private String phone;
 
+    private String category_name;
+
     public ContactDTO(Contact entity) {
         this.id = entity.getId();
         this.name = entity.getName();
         this.email = entity.getEmail();
         this.phone = entity.getPhone();
+        this.category_name = entity.getCategoryName();
     }
 }
