@@ -28,7 +28,7 @@ public class ContactService {
 
     private final CategoryRepository categoryRepository;
 
-    private static final String NOT_FOUND = "Contact not found: ";
+    private static final String NOT_FOUND = "Contact not found by id: ";
 
     @Transactional
     public List<ContactDTO> findAll(Sort direction) {

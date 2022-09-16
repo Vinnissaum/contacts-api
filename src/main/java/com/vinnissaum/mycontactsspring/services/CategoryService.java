@@ -23,7 +23,7 @@ public class CategoryService {
 
     private final CategoryRepository repository;
 
-    private static final String CATEGORY_NOT_FOUND = "Category not found: ";
+    private static final String NOT_FOUND = "Category not found by id: ";
 
     @Transactional
     public List<CategoryDTO> findAll() {
@@ -36,7 +36,7 @@ public class CategoryService {
     public CategoryDTO findById(UUID id) {
         Optional<Category> obj = repository.findById(id);
         Category entity = obj.orElseThrow(
-            () -> new ResourceNotFoundException(CATEGORY_NOT_FOUND + id));
+            () -> new ResourceNotFoundException(NOT_FOUND + id));
         return new CategoryDTO(entity);
     }
 
@@ -62,7 +62,7 @@ public class CategoryService {
 
             return new CategoryDTO(entity);
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(CATEGORY_NOT_FOUND + id);
+            throw new ResourceNotFoundException(NOT_FOUND + id);
         }
     }
 
@@ -72,7 +72,7 @@ public class CategoryService {
             repository.delete(entity);
 
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(CATEGORY_NOT_FOUND + id);
+            throw new ResourceNotFoundException(NOT_FOUND + id);
         }
     }
 
