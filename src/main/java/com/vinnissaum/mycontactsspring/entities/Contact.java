@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -30,8 +32,7 @@ public class Contact {
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "category_id")
-    private UUID categoryId;
-
-    private String categoryName;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

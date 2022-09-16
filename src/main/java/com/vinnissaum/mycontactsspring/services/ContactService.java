@@ -12,7 +12,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.vinnissaum.mycontactsspring.dto.ContactDTO;
+import com.vinnissaum.mycontactsspring.entities.Category;
 import com.vinnissaum.mycontactsspring.entities.Contact;
+import com.vinnissaum.mycontactsspring.repositories.CategoryRepository;
 import com.vinnissaum.mycontactsspring.repositories.ContactRepository;
 import com.vinnissaum.mycontactsspring.services.errors.DatabaseException;
 import com.vinnissaum.mycontactsspring.services.errors.ResourceNotFoundException;
@@ -24,11 +26,13 @@ import lombok.AllArgsConstructor;
 public class ContactService {
     private final ContactRepository repository;
 
-    private static final String CONTACT_NOT_FOUND = "Contact not found: ";
+    private final CategoryRepository categoryRepository;
+
+    private static final String NOT_FOUND = "Contact not found: ";
 
     @Transactional
     public List<ContactDTO> findAll(Sort direction) {
-        List<Contact> list = repository.findAll();
+        List<Contact> list = repository.findAll(direction);
 
         return list.stream().map(ContactDTO::new).toList();
     }
@@ -37,7 +41,7 @@ public class ContactService {
     public ContactDTO findById(UUID id) {
         Optional<Contact> obj = repository.findById(id);
         Contact entity = obj.orElseThrow(
-            () -> new ResourceNotFoundException(CONTACT_NOT_FOUND + id));
+            () -> new ResourceNotFoundException(NOT_FOUND + id));
 
         return new ContactDTO(entity);
     }
@@ -47,8 +51,11 @@ public class ContactService {
         nameExists(dto.getName());
 
         Contact entity = new Contact();
+        Category category = categoryRepository.getReferenceById(dto.getCategoryId());
+
         emailExists(dto.getEmail());
         toEntity(entity, dto);
+        entity.setCategory(category);
         entity = repository.save(entity);
 
         return new ContactDTO(entity);
@@ -65,7 +72,7 @@ public class ContactService {
             entity = repository.save(entity);
             return new ContactDTO(entity);
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(CONTACT_NOT_FOUND + id);
+            throw new ResourceNotFoundException(NOT_FOUND + id);
         }
     }
 
@@ -73,7 +80,7 @@ public class ContactService {
         try {
             repository.deleteById(id);
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(CONTACT_NOT_FOUND + id);
+            throw new ResourceNotFoundException(NOT_FOUND + id);
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Integrity violation: " + e.getMessage());
         }
