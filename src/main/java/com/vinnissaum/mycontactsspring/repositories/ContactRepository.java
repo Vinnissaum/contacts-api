@@ -10,4 +10,6 @@ import com.vinnissaum.mycontactsspring.entities.Contact;
 @Repository
 public interface ContactRepository extends JpaRepository<Contact, UUID>{
     Contact findByEmail(String email);
+
+    boolean existsByEmail(String email);
 }
