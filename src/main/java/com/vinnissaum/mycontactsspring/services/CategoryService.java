@@ -42,7 +42,7 @@ public class CategoryService {
 
     @Transactional
     public CategoryDTO create(CategoryDTO dto) {
-        nameExists(dto.getName());
+        nameIsNull(dto.getName());
 
         Category entity = new Category();
         entity.setName(dto.getName());
@@ -53,7 +53,7 @@ public class CategoryService {
 
     @Transactional
     public CategoryDTO update(UUID id, CategoryDTO dto) {
-        nameExists(dto.getName());
+        nameIsNull(dto.getName());
 
         try {
             Category entity = repository.getReferenceById(id);
@@ -76,7 +76,7 @@ public class CategoryService {
         }
     }
 
-    private void nameExists(String name) {
+    private void nameIsNull(String name) {
         if (name == null) {
             throw new DatabaseException("Name is required");
         }
