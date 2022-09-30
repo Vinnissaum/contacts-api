@@ -48,12 +48,16 @@ public class ContactService {
 
     @Transactional
     public ContactDTO create(ContactDTO dto) {
-        nameExists(dto.getName());
+        nameIsNull(dto.getName());
 
         Contact entity = new Contact();
         Category category = categoryRepository.getReferenceById(dto.getCategoryId());
 
-        emailExists(dto.getEmail());
+        boolean emailExists = repository.existsByEmail(dto.getEmail());
+        if (emailExists) {
+            throw new DatabaseException("This email has already been taken");
+        }
+
         toEntity(entity, dto);
         entity.setCategory(category);
         entity = repository.save(entity);
@@ -63,11 +67,15 @@ public class ContactService {
 
     @Transactional
     public ContactDTO update(UUID id, ContactDTO dto) {
-        nameExists(dto.getName());
+        nameIsNull(dto.getName());
+
+        boolean emailExists = repository.existsByEmail(dto.getEmail());
+        if (emailExists) {
+            throw new DatabaseException("This email has already been taken");
+        }
 
         try {
             Contact entity = repository.getReferenceById(id);
-            emailExists(dto.getEmail());
             toEntity(entity, dto);
             entity = repository.save(entity);
             return new ContactDTO(entity);
@@ -86,17 +94,9 @@ public class ContactService {
         }
     }
 
-    private void nameExists(String name) {
+    private void nameIsNull(String name) {
         if (name == null) {
             throw new DatabaseException("Name is required");
-        }
-    }
-
-    private void emailExists(String email) {
-        Contact emailExists = repository.findByEmail(email);
-
-        if (emailExists != null) {
-            throw new DatabaseException("This email has already been taken");
         }
     }
 
